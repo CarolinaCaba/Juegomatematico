@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Generador de números | Juego cálculo mental</title>
+    <title>Cálculo mental | números cada 5 seg</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: system-ui, 'Segoe UI', monospace;
-            background: #1e293b;
+            background: #0f172a;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -21,141 +21,285 @@
             padding: 20px;
         }
 
-        .card {
-            background: #0f172a;
-            border-radius: 32px;
-            padding: 40px 30px;
+        .game-container {
+            background: #1e293b;
+            border-radius: 40px;
+            padding: 30px 25px;
+            max-width: 550px;
             width: 100%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.4);
             border: 1px solid #334155;
+            text-align: center;
         }
 
-        .titulo {
+        h1 {
             color: #facc15;
-            font-size: 1.6rem;
-            font-weight: 600;
+            font-size: 1.8rem;
             margin-bottom: 8px;
-            letter-spacing: -0.3px;
         }
 
-        .subtitulo {
+        .rango-badge {
             color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 32px;
-            border-bottom: 1px dashed #334155;
-            padding-bottom: 12px;
+            background: #0f172a;
+            display: inline-block;
+            width: 100%;
+            padding: 8px;
+            border-radius: 60px;
+            margin-bottom: 30px;
         }
 
-        .numero {
+        .numero-actual {
             background: #020617;
             border-radius: 48px;
-            padding: 40px 20px;
+            padding: 45px 10px;
             margin: 20px 0;
-            border: 2px solid #334155;
+            border: 2px solid #facc15;
         }
 
-        .numero span {
+        .numero-actual span {
             font-size: 5.5rem;
             font-weight: 800;
             font-family: monospace;
             color: #facc15;
-            letter-spacing: 4px;
-            word-break: break-word;
         }
 
-        .rango {
-            color: #cbd5e1;
-            font-size: 1rem;
-            background: #1e293b;
-            display: inline-block;
-            padding: 6px 18px;
-            border-radius: 60px;
-            margin-bottom: 24px;
+        .botones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
 
         button {
             background: #facc15;
             border: none;
-            font-size: 1.6rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            padding: 14px 32px;
+            padding: 12px 24px;
             border-radius: 60px;
             color: #0f172a;
             cursor: pointer;
             transition: 0.2s;
-            font-family: inherit;
-            width: 100%;
-            max-width: 260px;
-            margin-top: 8px;
-            box-shadow: 0 4px 0 #b45309;
+            min-width: 120px;
         }
 
         button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #b45309;
+            transform: scale(0.97);
         }
 
-        .footer-note {
-            margin-top: 28px;
-            font-size: 0.75rem;
+        .btn-resultado {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-restart {
+            background: #ef4444;
+            color: white;
+        }
+
+        .resultado-final {
+            font-size: 1.6rem;
+            font-weight: bold;
+            background: #020617;
+            padding: 20px;
+            border-radius: 40px;
+            margin-top: 20px;
+            color: #facc15;
+            border: 1px solid #facc15;
+        }
+
+        .timer-text {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        .info-numeros {
             color: #475569;
+            font-size: 0.75rem;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="titulo">🎲 CÁLCULO MENTAL</div>
-    <div class="subtitulo">Números entre -50 y +50</div>
+<div class="game-container">
+    <h1>🧠 CÁLCULO MENTAL</h1>
+    <div class="rango-badge">🎲 Números entre -50 y +50 | cada 5 segundos</div>
 
-    <div class="rango">
-        ⚡ Rango: -50  a  +50
+    <div class="numero-actual">
+        <span id="numeroEnPantalla">0</span>
     </div>
 
-    <div class="numero">
-        <span id="numeroAleatorio">0</span>
+    <div class="botones">
+        <button id="startBtn">▶ START</button>
+        <button id="resultadoBtn" class="btn-resultado" style="display: none;">🧮 RESULTADO</button>
+        <button id="restartBtn" class="btn-restart" style="display: none;">🔄 RESTART</button>
     </div>
 
-    <button id="btnGenerar">▶ START</button>
-
-    <div class="footer-note">
-        ⚡ Cada vez que presionas START sale un número nuevo<br>
-        🧠 Ideal para juegos de cálculo mental
-    </div>
+    <div id="resultadoFinalDiv" class="resultado-final" style="display: none;"></div>
+    
+    <div class="timer-text" id="timerMsg"></div>
+    <div class="info-numeros" id="contadorInfo"></div>
 </div>
 
 <script>
-    // Función para generar número aleatorio entre -50 y 50 (inclusive)
-    function generarNumeroAleatorio() {
-        // Math.random() da entre 0 y 0.999...
-        // Multiplicamos por 101 para tener 101 valores posibles: de -50 a 50
-        const min = -50;
-        const max = 50;
-        const numero = Math.floor(Math.random() * (max - min + 1)) + min;
-        return numero;
+    // ---------- CONFIGURACIÓN ----------
+    const MIN = -50;
+    const MAX = 50;
+    const CANTIDAD_NUMEROS = 5;      // cuántos números saldrán
+    const INTERVALO_MS = 5000;        // 5 segundos
+
+    // ---------- ESTADO ----------
+    let numerosGenerados = [];         // guarda los números internamente (pero NO se muestran)
+    let intervaloActivo = null;
+    let juegoEnCurso = false;
+    let contadorGenerados = 0;
+
+    // ---------- ELEMENTOS DOM ----------
+    const numeroPantallaSpan = document.getElementById('numeroEnPantalla');
+    const startBtn = document.getElementById('startBtn');
+    const resultadoBtn = document.getElementById('resultadoBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const resultadoFinalDiv = document.getElementById('resultadoFinalDiv');
+    const timerMsg = document.getElementById('timerMsg');
+    const contadorInfo = document.getElementById('contadorInfo');
+
+    // ---------- FUNCIONES ----------
+    function generarAleatorio() {
+        return Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
     }
 
-    // Mostrar número en la pantalla
-    function actualizarNumero() {
-        const numero = generarNumeroAleatorio();
-        const spanNumero = document.getElementById('numeroAleatorio');
-        spanNumero.textContent = numero;
+    function actualizarPantallaConNumero(num) {
+        numeroPantallaSpan.textContent = num;
+    }
+
+    function mostrarContador() {
+        if (juegoEnCurso && contadorGenerados < CANTIDAD_NUMEROS) {
+            contadorInfo.textContent = `📊 Número ${contadorGenerados} de ${CANTIDAD_NUMEROS}`;
+        } else if (!juegoEnCurso && numerosGenerados.length === 0) {
+            contadorInfo.textContent = `🔘 Presiona START para comenzar (${CANTIDAD_NUMEROS} números)`;
+        } else if (numerosGenerados.length === CANTIDAD_NUMEROS) {
+            contadorInfo.textContent = `✅ Secuencia completa. Presiona RESULTADO.`;
+        }
+    }
+
+    function agregarNumeroInterno(num) {
+        numerosGenerados.push(num);
+        contadorGenerados = numerosGenerados.length;
+        actualizarPantallaConNumero(num);
+        mostrarContador();
+    }
+
+    function detenerIntervalo() {
+        if (intervaloActivo) {
+            clearInterval(intervaloActivo);
+            intervaloActivo = null;
+        }
+        juegoEnCurso = false;
+    }
+
+    function finalizarGeneracion() {
+        detenerIntervalo();
+        juegoEnCurso = false;
         
-        // Pequeño detalle: si el número es negativo, se ve el signo -
-        // Si es positivo, no tiene +
+        startBtn.style.display = 'none';
+        resultadoBtn.style.display = 'inline-block';
+        restartBtn.style.display = 'inline-block';
+        
+        timerMsg.textContent = '🎯 Secuencia terminada. Presiona RESULTADO para sumar.';
+        mostrarContador();
     }
 
-    // Obtener el botón y asignar evento
-    const boton = document.getElementById('btnGenerar');
-    boton.addEventListener('click', actualizarNumero);
+    function generarSiguiente() {
+        if (!juegoEnCurso) return;
+        
+        if (numerosGenerados.length >= CANTIDAD_NUMEROS) {
+            finalizarGeneracion();
+            return;
+        }
 
-    // Opcional: generar un número al cargar la página para que no empiece en 0
-    window.addEventListener('DOMContentLoaded', () => {
-        actualizarNumero();
-    });
+        const nuevoNum = generarAleatorio();
+        agregarNumeroInterno(nuevoNum);
+        
+        const restantes = CANTIDAD_NUMEROS - numerosGenerados.length;
+        if (restantes > 0) {
+            timerMsg.textContent = `⏳ Próximo número en 5 segundos... (faltan ${restantes})`;
+        }
+        
+        if (numerosGenerados.length >= CANTIDAD_NUMEROS) {
+            finalizarGeneracion();
+        }
+    }
+
+    function iniciarJuego() {
+        // Limpiar todo
+        detenerIntervalo();
+        numerosGenerados = [];
+        contadorGenerados = 0;
+        juegoEnCurso = true;
+        
+        // Ocultar botones hasta que termine
+        startBtn.style.display = 'none';
+        resultadoBtn.style.display = 'none';
+        restartBtn.style.display = 'none';
+        
+        // Limpiar resultado anterior
+        resultadoFinalDiv.style.display = 'none';
+        resultadoFinalDiv.innerHTML = '';
+        timerMsg.textContent = '🎲 Generando primer número...';
+        
+        // Primer número inmediato
+        const primerNumero = generarAleatorio();
+        agregarNumeroInterno(primerNumero);
+        
+        // Si la cantidad es 1, termina
+        if (CANTIDAD_NUMEROS === 1) {
+            finalizarGeneracion();
+            return;
+        }
+        
+        // Intervalo para los siguientes
+        intervaloActivo = setInterval(() => {
+            generarSiguiente();
+        }, INTERVALO_MS);
+    }
+
+    function mostrarResultado() {
+        if (numerosGenerados.length === 0) return;
+        
+        const sumaTotal = numerosGenerados.reduce((acc, val) => acc + val, 0);
+        resultadoFinalDiv.style.display = 'block';
+        resultadoFinalDiv.innerHTML = `🔢 RESULTADO: ${sumaTotal}`;
+        timerMsg.textContent = '✅ Juego terminado. Presiona RESTART para volver a jugar.';
+    }
+
+    function restartCompleto() {
+        detenerIntervalo();
+        numerosGenerados = [];
+        contadorGenerados = 0;
+        juegoEnCurso = false;
+        
+        // Resetear botones
+        startBtn.style.display = 'inline-block';
+        resultadoBtn.style.display = 'none';
+        restartBtn.style.display = 'none';
+        
+        // Limpiar pantalla
+        actualizarPantallaConNumero(0);
+        resultadoFinalDiv.style.display = 'none';
+        resultadoFinalDiv.innerHTML = '';
+        timerMsg.textContent = '';
+        contadorInfo.textContent = `🔘 Presiona START para comenzar (${CANTIDAD_NUMEROS} números)`;
+    }
+
+    // ---------- EVENTOS ----------
+    startBtn.addEventListener('click', iniciarJuego);
+    resultadoBtn.addEventListener('click', mostrarResultado);
+    restartBtn.addEventListener('click', restartCompleto);
+    
+    // Inicializar mensaje
+    contadorInfo.textContent = `🔘 Presiona START para comenzar (${CANTIDAD_NUMEROS} números)`;
 </script>
-
 </body>
 </html>
