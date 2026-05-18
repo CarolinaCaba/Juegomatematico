@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Generador de números | Juego cálculo mental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', monospace;
+            background: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: #0f172a;
+            border-radius: 32px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.4);
+            border: 1px solid #334155;
+        }
+
+        .titulo {
+            color: #facc15;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitulo {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 32px;
+            border-bottom: 1px dashed #334155;
+            padding-bottom: 12px;
+        }
+
+        .numero {
+            background: #020617;
+            border-radius: 48px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            border: 2px solid #334155;
+        }
+
+        .numero span {
+            font-size: 5.5rem;
+            font-weight: 800;
+            font-family: monospace;
+            color: #facc15;
+            letter-spacing: 4px;
+            word-break: break-word;
+        }
+
+        .rango {
+            color: #cbd5e1;
+            font-size: 1rem;
+            background: #1e293b;
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 60px;
+            margin-bottom: 24px;
+        }
+
+        button {
+            background: #facc15;
+            border: none;
+            font-size: 1.6rem;
+            font-weight: bold;
+            padding: 14px 32px;
+            border-radius: 60px;
+            color: #0f172a;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            width: 100%;
+            max-width: 260px;
+            margin-top: 8px;
+            box-shadow: 0 4px 0 #b45309;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b45309;
+        }
+
+        .footer-note {
+            margin-top: 28px;
+            font-size: 0.75rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="titulo">🎲 CÁLCULO MENTAL</div>
+    <div class="subtitulo">Números entre -50 y +50</div>
+
+    <div class="rango">
+        ⚡ Rango: -50  a  +50
+    </div>
+
+    <div class="numero">
+        <span id="numeroAleatorio">0</span>
+    </div>
+
+    <button id="btnGenerar">▶ START</button>
+
+    <div class="footer-note">
+        ⚡ Cada vez que presionas START sale un número nuevo<br>
+        🧠 Ideal para juegos de cálculo mental
+    </div>
+</div>
+
+<script>
+    // Función para generar número aleatorio entre -50 y 50 (inclusive)
+    function generarNumeroAleatorio() {
+        // Math.random() da entre 0 y 0.999...
+        // Multiplicamos por 101 para tener 101 valores posibles: de -50 a 50
+        const min = -50;
+        const max = 50;
+        const numero = Math.floor(Math.random() * (max - min + 1)) + min;
+        return numero;
+    }
+
+    // Mostrar número en la pantalla
+    function actualizarNumero() {
+        const numero = generarNumeroAleatorio();
+        const spanNumero = document.getElementById('numeroAleatorio');
+        spanNumero.textContent = numero;
+        
+        // Pequeño detalle: si el número es negativo, se ve el signo -
+        // Si es positivo, no tiene +
+    }
+
+    // Obtener el botón y asignar evento
+    const boton = document.getElementById('btnGenerar');
+    boton.addEventListener('click', actualizarNumero);
+
+    // Opcional: generar un número al cargar la página para que no empiece en 0
+    window.addEventListener('DOMContentLoaded', () => {
+        actualizarNumero();
+    });
+</script>
+
+</body>
+</html>
